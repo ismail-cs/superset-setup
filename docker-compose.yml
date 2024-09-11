@@ -1,0 +1,44 @@
+version: "3.5"
+services:
+
+  superset:
+    build:
+      context: /data/superset/
+      dockerfile: /data/superset/Dockerfile
+    container_name: superset
+    env_file: /data/superset/.env
+    restart: always
+    ports:
+      - 7000:8000
+    networks:
+      - hris
+
+  mysql_db:
+    image: mysql:8.0 # Specify the MySQL version
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: "3Hw0JWMThgz48Stbo"  # Replace with your desired root password
+      MYSQL_DATABASE: superset_main  # Replace with your desired database name
+      MYSQL_USER: superset_test  # Replace with your desired user
+      MYSQL_PASSWORD: "3Hw0JWMThgz48Stbo"  # Replace with your desired password
+    ports:
+      - "3306:3306"  # Maps the MySQL port to the host machine
+    networks:
+      - hris
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      - /data/superset/redis.conf:/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    networks: 
+      - hris 
+  
+networks:
+  hris:
+    driver: bridge
+    enable_ipv6: false
